@@ -2,45 +2,58 @@ import re
 import os
 import PyPDF2
 
-if __name__ == '__main__':
-    ll = ["abbrev", "adj", "adv", "av", "Am", "Eng", "Br", "conj", "det", " exclam", "mv", "n", "phrv", "pi", "prep",
-          "prep", "phr" "pron", "sing", "v"]
-    words = "words directory"
-    root_dir = os.path.abspath(os.curdir)
-    path = os.path.join(root_dir, words)
-    path1 = os.path.join(path, "extract-words-from-pdf.txt")
-    if not os.path.exists(path):
-        os.mkdir(path)
-    regex = re.compile('[^a-zA-Z]')
-    pdfFileObj = open('words.pdf', 'rb')
-    pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-    for i in range(pdfReader.numPages):
-        print(i)
-        pageObj = pdfReader.getPage(i)
-        f = open(path1, "a")
-        txt = pageObj.extractText().split(" ")
-        l = []
-        for i in txt:
-            pp = []
-            xc = i.find('/n')
-            if xc > -1:
-                i = i.replace('/n', '')
-            cv = i.find('/')
-            if cv > -1:
-                pp = i.split('/')
-            else:
-                pp.append(i)
-            for ppp in pp:
-                b = regex.sub('', ppp)
-                if b != "" and len(b) > 1 and b not in ll:
-                    l.append(b)
+stemWords = ["abbrev", "adj", "adv", "av", "Am", "Eng", "Br", "conj", "det", " exclam", "mv", "n", "phrv", "pi",
+             "prep",
+             "prep", "phr" "pron", "sing", "v"]
 
-        l.sort()
-        print(l)
-        dict = {}
-        for i in l:
-            # if dict[i] is not None:
-            dict[i] = 1
-        print(dict.keys())
-        f.write(" ".join(dict.keys()) + '\n')
-        f.close()
+wordsDirectory = "words directory"
+
+
+def createDirectory(wordDirectory, fileName):
+    root_dir = os.path.abspath(os.curdir)
+    pathWordsDirectory = os.path.join(root_dir, wordDirectory)
+    pathFileWord = os.path.join(pathWordsDirectory, fileName)
+    if not os.path.exists(pathWordsDirectory):
+        os.mkdir(pathWordsDirectory)
+    return pathFileWord
+
+
+def pdfReaderFunction():
+    pdfFileObj = open('words.pdf', 'rb')
+    return PyPDF2.PdfFileReader(pdfFileObj)
+
+
+def wordCleaner(pageContent):
+    pageContentWord = []
+    for word in pageContent:
+        cleanedWords = []
+        findNewLine = word.find('/n')
+        if findNewLine > -1:
+            word = word.replace('/n', '')
+        findDivideSymbol = word.find('/')
+        if findDivideSymbol > -1:
+            cleanedWords = word.split('/')
+        else:
+            cleanedWords.append(word)
+        for wordClean in cleanedWords:
+            wordClean = regex.sub('', wordClean)
+            if wordClean != "" and len(wordClean) > 1 and wordClean not in stemWords:
+                pageContentWord.append(wordClean)
+    return pageContentWord
+
+
+if __name__ == '__main__':
+    pathFileWords = createDirectory(wordsDirectory, "extract-words-from-pdf.txt")
+    regex = re.compile('[^a-zA-Z]')
+    pdfReader = pdfReaderFunction()
+    for pageIndex in range(4, pdfReader.numPages):
+        pageObj = pdfReader.getPage(pageIndex)
+        openFileWords = open(pathFileWords, "a")
+        pageContents = pageObj.extractText().split(" ")
+        pageContentWords = wordCleaner(pageContents)
+        pageContentWords.sort()
+        oneWordPerPage = {}
+        for index in pageContentWords:
+            oneWordPerPage[index] = 1
+        openFileWords.write(" ".join(oneWordPerPage.keys()) + '\n')
+        openFileWords.close()
