@@ -1,7 +1,9 @@
+# python default library
 import re
 import os
 import json
 import string
+# third party library to play with pdf files
 import PyPDF2
 
 stemWords = ["abbrev", "adj", "adv", "av", "Am", "Eng", "Br", "conj", "det", " exclam", "mv", "n", "phrv", "pi",
@@ -9,6 +11,7 @@ stemWords = ["abbrev", "adj", "adv", "av", "Am", "Eng", "Br", "conj", "det", " e
              "prep", "phr" "pron", "sing", "v"]
 
 
+# create "words directory" in root of project
 def createDirectory():
     wordsDirectory = "words directory"
     root_dir = os.path.abspath(os.curdir)
@@ -17,6 +20,7 @@ def createDirectory():
         os.mkdir(pathWordsDirectory)
 
 
+# path manipulation for files
 def FilePathWords(filename, wordsDirectory="words directory"):
     root_dir = os.path.abspath(os.curdir)
     pathWordsDirectory = os.path.join(root_dir, wordsDirectory)
@@ -24,11 +28,13 @@ def FilePathWords(filename, wordsDirectory="words directory"):
     return pathFileWord
 
 
+# open words.pdf return as object
 def pdfReaderFunction():
     pdfFileObj = open('words.pdf', 'rb')
     return PyPDF2.PdfFileReader(pdfFileObj)
 
 
+# take page pdf Content and cleaned it
 def wordCleaner(pageContent):
     pageContentWord = []
     for word in pageContent:
@@ -48,6 +54,7 @@ def wordCleaner(pageContent):
     return pageContentWord
 
 
+# clean Documents and delete duplicates
 def cleanDocument(pathFileWord):
     contentWordsTxt = open(pathFileWord, 'r')
     listStringFile = contentWordsTxt.readline().lower().split(" ")
@@ -57,6 +64,7 @@ def cleanDocument(pathFileWord):
     return " ".join(removeDuplicateWord)
 
 
+# Generate file content all unique words
 def cleanFileTxt(stringsJoined):
     cleanedFilePath = FilePathWords("cleanedFile.txt")
     cleanedFile = open(cleanedFilePath, 'w')
@@ -64,7 +72,8 @@ def cleanFileTxt(stringsJoined):
     cleanedFile.close()
 
 
-def createDictonaryChar():
+# create dictionary contain 'a':[] ,'b:[]....etc
+def createDictionaryChar():
     dicWords = {}
     for index in string.ascii_lowercase:
         dicWords[index] = []
@@ -91,7 +100,7 @@ if __name__ == '__main__':
     stringJoined = cleanDocument(pathFileWords)
     cleanFileTxt(stringJoined)
 
-    dicWord = createDictonaryChar()
+    dicWord = createDictionaryChar()
 
     loadStringJoined = open(FilePathWords("cleanedFile.txt"))
     extractString = loadStringJoined.readline().split(" ")
