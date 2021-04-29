@@ -9,13 +9,18 @@ stemWords = ["abbrev", "adj", "adv", "av", "Am", "Eng", "Br", "conj", "det", " e
              "prep", "phr" "pron", "sing", "v"]
 
 
-def createDirectory(fileName):
+def createDirectory():
     wordsDirectory = "words directory"
     root_dir = os.path.abspath(os.curdir)
     pathWordsDirectory = os.path.join(root_dir, wordsDirectory)
-    pathFileWord = os.path.join(pathWordsDirectory, fileName)
     if not os.path.exists(pathWordsDirectory):
         os.mkdir(pathWordsDirectory)
+
+
+def FilePathWords(filename, wordsDirectory="words directory"):
+    root_dir = os.path.abspath(os.curdir)
+    pathWordsDirectory = os.path.join(root_dir, wordsDirectory)
+    pathFileWord = os.path.join(pathWordsDirectory, filename)
     return pathFileWord
 
 
@@ -53,14 +58,22 @@ def cleanDocument(pathFileWord):
 
 
 def cleanFileTxt(stringsJoined):
-    cleanedFilePath = createDirectory("cleanedFile.txt")
+    cleanedFilePath = FilePathWords("cleanedFile.txt")
     cleanedFile = open(cleanedFilePath, 'w')
     cleanedFile.write(stringsJoined)
     cleanedFile.close()
 
 
+def createDictonaryChar():
+    dicWords = {}
+    for index in string.ascii_lowercase:
+        dicWords[index] = []
+    return dicWords
+
+
 if __name__ == '__main__':
-    pathFileWords = createDirectory("extract-words-from-pdf.txt")
+    createDirectory()
+    pathFileWords = FilePathWords("extract-words-from-pdf.txt")
     regex = re.compile('[^a-zA-Z]')
     pdfReader = pdfReaderFunction()
     for pageIndex in range(4, pdfReader.numPages):
@@ -78,15 +91,15 @@ if __name__ == '__main__':
     stringJoined = cleanDocument(pathFileWords)
     cleanFileTxt(stringJoined)
 
-    jsonWord = {}
-    for i in string.ascii_lowercase:
-        jsonWord[i] = []
-    loadStringJoined = open(createDirectory("cleanedFile.txt"))
-    extractString = loadStringJoined.readline().split(" ")
-    for word in extractString:
-        jsonWord[word[0]] = [word] + jsonWord[word[0]]
-    json_object = json.dumps(jsonWord, indent=4)
+    dicWord = createDictonaryChar()
 
-    # Writing to sample.json
-    with open(createDirectory("words.json"), "w") as outfile:
-        outfile.write(json_object)
+    loadStringJoined = open(FilePathWords("cleanedFile.txt"))
+    extractString = loadStringJoined.readline().split(" ")
+
+    for word in extractString:
+        dicWord[word[0]] = [word] + dicWord[word[0]]
+    jsonWord = json.dumps(dicWord, indent=4)
+
+    jsonFile = open(FilePathWords("words.json"), "w")
+    jsonFile.write(jsonWord)
+    jsonFile.close()
