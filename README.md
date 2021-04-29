@@ -16,3 +16,4 @@ main.py contain all codes to make that happen
 <p>I used pycharm community edition to create this project by the power of Python 3.8.1</p>
 <p>Notes: install PyPDF2 library to play with any pdf file</p>
 <p>final words, I know that code is not perfect and code cant get all the words from "words.pdf",you can forked the code and play with it as much you need.</p>
+<p>Adding MIT license  to make it easy to play with it</p>
