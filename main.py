@@ -6,12 +6,11 @@ stemWords = ["abbrev", "adj", "adv", "av", "Am", "Eng", "Br", "conj", "det", " e
              "prep",
              "prep", "phr" "pron", "sing", "v"]
 
-wordsDirectory = "words directory"
 
-
-def createDirectory(wordDirectory, fileName):
+def createDirectory(fileName):
+    wordsDirectory = "words directory"
     root_dir = os.path.abspath(os.curdir)
-    pathWordsDirectory = os.path.join(root_dir, wordDirectory)
+    pathWordsDirectory = os.path.join(root_dir, wordsDirectory)
     pathFileWord = os.path.join(pathWordsDirectory, fileName)
     if not os.path.exists(pathWordsDirectory):
         os.mkdir(pathWordsDirectory)
@@ -42,8 +41,24 @@ def wordCleaner(pageContent):
     return pageContentWord
 
 
+def cleanDocument(pathFileWord):
+    contentWordsTxt = open(pathFileWord, 'r')
+    listStringFile = contentWordsTxt.readline().lower().split(" ")
+    listStringFile.sort()
+    removeDuplicateWord = []
+    [removeDuplicateWord.append(word) for word in listStringFile if word not in removeDuplicateWord]
+    return " ".join(removeDuplicateWord)
+
+
+def cleanFileTxt(stringsJoined):
+    cleanedFilePath = createDirectory("cleanedFile.txt")
+    cleanedFile = open(cleanedFilePath, 'w')
+    cleanedFile.write(stringsJoined)
+    cleanedFile.close()
+
+
 if __name__ == '__main__':
-    pathFileWords = createDirectory(wordsDirectory, "extract-words-from-pdf.txt")
+    pathFileWords = createDirectory("extract-words-from-pdf.txt")
     regex = re.compile('[^a-zA-Z]')
     pdfReader = pdfReaderFunction()
     for pageIndex in range(4, pdfReader.numPages):
@@ -55,5 +70,8 @@ if __name__ == '__main__':
         oneWordPerPage = {}
         for index in pageContentWords:
             oneWordPerPage[index] = 1
-        openFileWords.write(" ".join(oneWordPerPage.keys()) + '\n')
+        openFileWords.write(" ".join(oneWordPerPage.keys()))
         openFileWords.close()
+
+    stringJoined = cleanDocument(pathFileWords)
+    cleanFileTxt(stringJoined)
