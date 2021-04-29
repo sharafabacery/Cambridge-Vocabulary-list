@@ -1,5 +1,7 @@
 import re
 import os
+import json
+import string
 import PyPDF2
 
 stemWords = ["abbrev", "adj", "adv", "av", "Am", "Eng", "Br", "conj", "det", " exclam", "mv", "n", "phrv", "pi",
@@ -75,3 +77,16 @@ if __name__ == '__main__':
 
     stringJoined = cleanDocument(pathFileWords)
     cleanFileTxt(stringJoined)
+
+    jsonWord = {}
+    for i in string.ascii_lowercase:
+        jsonWord[i] = []
+    loadStringJoined = open(createDirectory("cleanedFile.txt"))
+    extractString = loadStringJoined.readline().split(" ")
+    for word in extractString:
+        jsonWord[word[0]] = [word] + jsonWord[word[0]]
+    json_object = json.dumps(jsonWord, indent=4)
+
+    # Writing to sample.json
+    with open(createDirectory("words.json"), "w") as outfile:
+        outfile.write(json_object)
